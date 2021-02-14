@@ -139,11 +139,9 @@ Clusters shaking(Clusters prev_sol, int i) {
     Clusters result = prev_sol;
     switch (i) {
         case 0:
-            puts("&");
             result = division(result);
             break;
         case 1:
-            puts("!");
             result = merge(result);
             break;
     }
@@ -154,11 +152,9 @@ Clusters vnd(Clusters prev_sol, int i) {
     Clusters result = prev_sol;
     switch (i) {
         case 0:
-            puts("#");
             result = moveColumns(result);
             break;
         case 1:
-            puts("*");
             result = moveRows(result);
             break;
     }
@@ -187,14 +183,6 @@ Clusters GeneralVNS(Matrix* matrix, int k) {
             sf_num++;
             if (new_sol.efficacy > init_solution.efficacy) {
                 init_solution = new_sol;
-                for (int i = 0; i < init_solution.m.size(); i++) {
-                    std::cout << init_solution.m[i] << " ";
-                }
-                puts("");
-                for (int i = 0; i < init_solution.p.size(); i++) {
-                    std::cout << init_solution.p[i] << " ";
-                }
-                std::cout << init_solution.efficacy << std::endl;
                 sf_num = 0;
                 j = 0;
             }
