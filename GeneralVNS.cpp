@@ -28,14 +28,21 @@ void Clusters::groupingEfficacy() {
 }
 
 bool is_good(Clusters init) {
-    std::vector<int> clusters_arr(init.clustersNum, 0);
-    for (int i = 0; i < init.m.size(); i++) {
+      std::vector<int> clusters_arr(*std::max_element(init.m.begin(), init.m.end()), 0);
+      int f = 0;
+      for (int i = 0; i < init.m.size(); i++) {
         for (int j = 0; j < init.p.size(); j++) {
-            if (init.m[i] == init.p[j])
+          if (init.m[i] == init.p[j])
+          {
+            if (clusters_arr[init.m[i] - 1] == 0) {
               clusters_arr[init.m[i] - 1] = 1;
+              f++;
+            }
+          }
+            
         }
     }
-    if (std::find(clusters_arr.begin(), clusters_arr.end(), 0) != clusters_arr.end())
+    if (f == init.clustersNum)
         return true;
     return false;
 }
@@ -79,35 +86,28 @@ Clusters moveRows(Clusters init) {
 Clusters merge(Clusters init) {
     Clusters result = init;
     int n = 0, boolean = 0;
-    while ((n < 1000)&&(boolean == 0)&&(init.clustersNum > 1)) {
-        int f_cluster = rand() % init.clustersNum + 1;
-        int s_cluster = rand() % init.clustersNum + 1;
+    while ((n < 1000)&&(boolean == 0)&&(result.clustersNum > 1)) {
+        int f_cluster = rand() % result.clustersNum + 1;
+        int s_cluster = rand() % result.clustersNum + 1;
         if (f_cluster == s_cluster) {
-            while (f_cluster != s_cluster) {
-                s_cluster = rand() % init.clustersNum + 1;
-            }
+          while (f_cluster != s_cluster) {
+            s_cluster = rand() % result.clustersNum + 1;
+          }
         }
         for (int i = 0; i < result.m.size(); i++) {
             if (result.m[i] == s_cluster) {
                 result.m[i] = f_cluster;
-            }
-            if (result.m[i] == init.clustersNum) {
-                result.m[i] = s_cluster;
             }
         }
         for (int i = 0; i < result.p.size(); i++) {
             if (result.p[i] == s_cluster) {
                 result.p[i] = f_cluster;
             }
-            if (result.p[i] == init.clustersNum) {
-                result.p[i] = s_cluster;
-            }
         }
+        result.clustersNum--;
         boolean = is_good(result);
         n++;
     }
-    if (result.efficacy != init.efficacy)
-        result.clustersNum--;
     result.groupingEfficacy();
     return result;
 }
@@ -117,20 +117,22 @@ Clusters division(Clusters init) {
     int n = 0, boolean = 0;
     while ((n < 1000)&&(boolean == 0)) {
         result = init;
-        int new_cluster = init.clustersNum + 1;
-        for (int i = 0; i < rand()%init.m.size() / 2; i++) {
-            int rand_m = rand()%init.m.size();
+        int new_cluster = result.clustersNum + 1;
+        if (result.m.size() == result.clustersNum) {
+          return result;
+        }
+        for (int i = 0; i < rand()%result.m.size() / 2; i++) {
+            int rand_m = rand()%result.m.size();
             result.m[rand_m] = new_cluster;
         }
-        for (int i = 0; i < rand()%init.p.size() / 2; i++) {
-            int rand_p = rand()%init.p.size();
+        for (int i = 0; i < rand() % result.p.size() / 2; i++) {
+            int rand_p = rand()%result.p.size();
             result.p[rand_p] = new_cluster;
         }
+        result.clustersNum++;
         boolean = is_good(result);
         n++;
     }
-    if (result.efficacy != init.efficacy)
-        result.clustersNum++;
     result.groupingEfficacy();
     return result;
 }
@@ -139,10 +141,12 @@ Clusters shaking(Clusters prev_sol, int i) {
     Clusters result = prev_sol;
     switch (i) {
         case 0:
-            result = division(result);
+            puts("&");
+            result = merge(result);
             break;
         case 1:
-            result = merge(result);
+            puts("!");
+            result = division(result);
             break;
     }
     return result;
@@ -152,9 +156,11 @@ Clusters vnd(Clusters prev_sol, int i) {
     Clusters result = prev_sol;
     switch (i) {
         case 0:
+            puts("#");
             result = moveColumns(result);
             break;
         case 1:
+            puts("*");
             result = moveRows(result);
             break;
     }
@@ -183,6 +189,14 @@ Clusters GeneralVNS(Matrix* matrix, int k) {
             sf_num++;
             if (new_sol.efficacy > init_solution.efficacy) {
                 init_solution = new_sol;
+                for (int i = 0; i < init_solution.m.size(); i++) {
+                    std::cout << init_solution.m[i] << " ";
+                }
+                puts("");
+                for (int i = 0; i < init_solution.p.size(); i++) {
+                    std::cout << init_solution.p[i] << " ";
+                }
+                std::cout << init_solution.efficacy << std::endl;
                 sf_num = 0;
                 j = 0;
             }
