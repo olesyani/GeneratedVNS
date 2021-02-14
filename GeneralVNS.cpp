@@ -32,7 +32,7 @@ bool is_good(Clusters init) {
     for (int i = 0; i < init.m.size(); i++) {
         for (int j = 0; j < init.p.size(); j++) {
             if (init.m[i] == init.p[j])
-              clusters_arr.insert(clusters_arr.begin() + init.m[i] - 1, 1);
+              clusters_arr[init.m[i] - 1] = 1;
         }
     }
     if (std::find(clusters_arr.begin(), clusters_arr.end(), 0) != clusters_arr.end())
