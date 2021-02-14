@@ -82,19 +82,32 @@ Clusters merge(Clusters init) {
     while ((n < 1000)&&(boolean == 0)&&(init.clustersNum > 1)) {
         int f_cluster = rand() % init.clustersNum + 1;
         int s_cluster = rand() % init.clustersNum + 1;
+        if (f_cluster == s_cluster) {
+            while (f_cluster != s_cluster) {
+                s_cluster = rand() % init.clustersNum + 1;
+            }
+        }
         for (int i = 0; i < result.m.size(); i++) {
             if (result.m[i] == s_cluster) {
                 result.m[i] = f_cluster;
+            }
+            if (result.m[i] == init.clustersNum) {
+                result.m[i] = s_cluster;
             }
         }
         for (int i = 0; i < result.p.size(); i++) {
             if (result.p[i] == s_cluster) {
                 result.p[i] = f_cluster;
             }
+            if (result.p[i] == init.clustersNum) {
+                result.p[i] = s_cluster;
+            }
         }
         boolean = is_good(result);
         n++;
     }
+    if (result.efficacy != init.efficacy)
+        result.clustersNum--;
     result.groupingEfficacy();
     return result;
 }
@@ -116,6 +129,8 @@ Clusters division(Clusters init) {
         boolean = is_good(result);
         n++;
     }
+    if (result.efficacy != init.efficacy)
+        result.clustersNum++;
     result.groupingEfficacy();
     return result;
 }
@@ -151,7 +166,7 @@ Clusters vnd(Clusters prev_sol, int i) {
 }
 
 Clusters GeneralVNS(Matrix* matrix, int k) {
-    int j_max = 10, j = 0;
+    int j_max = 100, j = 0;
     int sf_num = 0, vnd_num = 0;
     Clusters init_solution(*matrix);
     init_solution.clustering(k);
